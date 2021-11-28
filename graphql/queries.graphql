@@ -1,0 +1,12 @@
+query GetCats {
+  cats {
+    id
+    insertedAt
+    lat
+    lng
+    creator {
+      id
+      name
+    }
+  }
+}

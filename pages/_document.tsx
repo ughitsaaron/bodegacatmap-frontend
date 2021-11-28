@@ -9,7 +9,7 @@ export default class BodegaCatsDocument extends Document {
 
     try {
       context.renderPage = () => originalRenderPage({
-        enhanceApp: (App) => (props) =>styleSheet.collectStyles(<App {...props} />),
+        enhanceApp: (App) => (props) => styleSheet.collectStyles(<App {...props} />),
       });
 
       const initialProps = await Document.getInitialProps(context);
