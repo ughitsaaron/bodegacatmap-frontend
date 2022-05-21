@@ -1,6 +1,5 @@
+import { ApolloClient, createHttpLink, InMemoryCache } from '@apollo/client';
 import { setContext } from '@apollo/client/link/context';
-import { createHttpLink, ApolloClient, InMemoryCache } from '@apollo/client';
-import { onError } from '@apollo/client/link/error';
 import type { Session } from '@auth0/nextjs-auth0';
 
 let accessToken: string;
@@ -28,10 +27,8 @@ const authLink = setContext(async (_, { headers }) => {
   };
 });
 
-export function initApolloClient() {
-  const httpLink = createHttpLink({
-    uri: 'http://localhost:4000/graphql',
-  });
+function initApolloClient() {
+  const httpLink = createHttpLink({ uri: '/graphql' });
 
   const client = new ApolloClient({
     link: authLink.concat(httpLink),
@@ -41,3 +38,5 @@ export function initApolloClient() {
 
   return client;
 }
+
+export const client = initApolloClient();

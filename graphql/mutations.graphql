@@ -1,0 +1,13 @@
+mutation CreateCatMutation($lat: Float!, $lng: Float!) {
+  createCat(lat: $lat, lng: $lng) {
+    id
+    lat
+    lng
+    images {
+      path
+    }
+    creator {
+      id
+    }
+  }
+}

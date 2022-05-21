@@ -3,6 +3,8 @@
     "next/core-web-vitals"
   ],
   "rules": {
-    "react/jsx-sort-props": "error"
+    "react/jsx-sort-props": "error",
+    "@next/next/link-passhref": 0,
+    "react/display-name": 0
   }
 }
