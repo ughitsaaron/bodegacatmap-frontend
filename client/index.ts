@@ -5,13 +5,15 @@ import type { Session } from '@auth0/nextjs-auth0';
 let accessToken: string;
 
 const authLink = setContext(async (_, { headers }) => {
-  if (Boolean(accessToken)) {
-    return {
-      headers: {
-        ...headers,
-        authorization: accessToken ? `Bearer ${accessToken}` : '',
-      },
-    };
+  const makeHeaders = (accessToken: string) => ({
+    headers: {
+      ...headers,
+      authorization: `Bearer ${accessToken}`,
+    },
+  });
+
+  if (accessToken) {
+    return makeHeaders(accessToken);
   }
 
   const response = await fetch('http://localhost:3000/api/auth/token', { credentials: 'include' });
@@ -19,21 +21,17 @@ const authLink = setContext(async (_, { headers }) => {
 
   accessToken = session.idToken;
 
-  return {
-    headers: {
-      ...headers,
-      authorization: accessToken ? `Bearer ${accessToken}` : '',
-    },
-  };
+  return makeHeaders(accessToken);
 });
 
 function initApolloClient() {
   const httpLink = createHttpLink({ uri: '/graphql' });
 
   const client = new ApolloClient({
-    link: authLink.concat(httpLink),
     cache: new InMemoryCache(),
+    connectToDevTools: true,
     credentials: 'include',
+    link: authLink.concat(httpLink),
   });
 
   return client;

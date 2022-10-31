@@ -1,4 +1,4 @@
-mutation CreateCatMutation($lat: Float!, $lng: Float!) {
+mutation CreateCat($lat: Float!, $lng: Float!) {
   createCat(lat: $lat, lng: $lng) {
     id
     lat
@@ -9,5 +9,17 @@ mutation CreateCatMutation($lat: Float!, $lng: Float!) {
     creator {
       id
     }
+  }
+}
+
+mutation CreatePhoto($catId: ID!, $path: String!) {
+  createImage(catId: $catId, path: $path) {
+    id
+    creator {
+      id
+      name
+    }
+    path
+    insertedAt
   }
 }

@@ -1,49 +1,63 @@
-import AddIcon from '@mui/icons-material/Add';
-import { ComponentRef, useRef } from 'react';
+import { AddLocation, AddLocationAlt } from '@mui/icons-material';
 import { useMap } from 'react-leaflet';
-import { useCreateCatMutationMutation } from '../../generated/graphql';
+import { useCreateCatMutation, LatLngFragmentDoc } from '../../generated/graphql';
+import type { LatLngFragment } from '../../generated/graphql';
+import { Box, Chip } from '@mui/material';
+import { useRouter } from 'next/router';
+import { HeaderActions } from '../../components/Header';
 
-const ICON_DIMENSION = 35;
+export function NewPage() {
+  const map = useMap();
+  const { push } = useRouter();
+  const [createCat, { loading, error, data }] = useCreateCatMutation({
+    update: (cache, { data, errors }) => {
+      if (!errors) {
+        cache.modify({
+          fields: {
+            cats: (cats) => {
+              const id = cache.identify({ __typename: 'Cat', id: data?.createCat.id });
+              const ref = cache.writeFragment<LatLngFragment>({
+                id,
+                data: data?.createCat,
+                fragment: LatLngFragmentDoc,
+              });
 
-// @refresh reset
-export default function NewPage() {
-  const [createCat] = useCreateCatMutationMutation();
+              return [...cats, ref];
+            },
+          },
+        });
+      }
+    },
+  });
 
-  function handleOnSave() {
-    // const { lat, lng } = map.getCenter();
-    // createCat({ variables: { lat, lng } });
+  async function handleOnSave() {
+    const { lat, lng } = map.getCenter();
+    const result = await createCat({ variables: { lat, lng } });
+    push(`/cat/${result.data.createCat.id}`);
   }
 
-  // const handleFileInput = () => {
-  //   inputRef?.current?.click();
-  // };
-
-  // const handleChange: ChangeEventHandler<HTMLInputElement> = async (event) => {
-  //   const formData = new FormData();
-  //   formData.append('image', event?.target?.files[0]);
-  //   await fetch('/image', { method: 'POST', body: formData });
-  // };
-
-  return <NewMarker />;
-}
-
-function NewMarker() {
-  const iconRef = useRef<ComponentRef<typeof AddIcon>>(null);
-  const map = useMap();
-
-  const mapContainerRect = map.getContainer().getBoundingClientRect();
-  const mapOffsetTop = mapContainerRect.top;
-  const mapHeight = mapContainerRect.height;
-
-  const x = mapContainerRect.right / 2 - ICON_DIMENSION / 2;
-  const y = mapOffsetTop + mapHeight / 2 - ICON_DIMENSION / 2;
-
   return (
-    <AddIcon
-      fontSize="large"
-      htmlColor="black"
-      ref={iconRef}
-      sx={{ transform: `translate3d(${x}px, ${y}px, 0)` }}
-    />
+    <>
+      <Box
+        alignItems="center"
+        display={loading ? 'none' : 'flex'}
+        height="100%"
+        justifyContent="center"
+        position="relative"
+        zIndex={405}
+      >
+        <AddLocation fontSize="large" htmlColor="black" />
+      </Box>
+      <HeaderActions>
+        <Chip
+          clickable={true}
+          color="primary"
+          disabled={loading && !error && !data}
+          icon={<AddLocationAlt />}
+          label="Add map location"
+          onClick={handleOnSave}
+        />
+      </HeaderActions>
+    </>
   );
 }

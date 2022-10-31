@@ -21,11 +21,9 @@ type Props = {
 
 export function Map({ children = null, zoomControlPosition, ...other }: Props) {
   return (
-    <>
-      <MapContainer ref={addMapboxLayer} zoomControl={false} {...other}>
-        {children}
-        {zoomControlPosition && <ZoomControl position={zoomControlPosition} />}
-      </MapContainer>
-    </>
+    <MapContainer ref={addMapboxLayer} zoomControl={false} {...other}>
+      {zoomControlPosition && <ZoomControl position={zoomControlPosition} />}
+      {children}
+    </MapContainer>
   );
 }

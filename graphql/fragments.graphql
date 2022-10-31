@@ -1,0 +1,4 @@
+fragment LatLng on Cat {
+  lat
+  lng
+}
